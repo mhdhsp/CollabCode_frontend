@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import LeftSidebar from "../Components/LeftSideBar";
 import { UserRooms } from "../Services/UserService";
 import MainSection from "../Components/MainSection";
+import { CreateNewRoom, JoinRoom } from "../Services/RoomSerive";
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
@@ -23,7 +24,41 @@ export default function Dashboard() {
     fetchUserRooms();
   }, [selectedRoom]);
 
+<<<<<<< HEAD
 
+=======
+  // Handle room creation
+  const handleCreateRoom = async (roomData) => {
+    try {
+      console.log("Creating Room:", roomData);
+      const response = await CreateNewRoom(roomData);
+
+      if (response?.data) {
+        alert("✅ Room created successfully!");
+        await fetchUserRooms(); // refresh sidebar with latest rooms
+      } else {
+        alert("⚠️ Room creation failed.");
+      }
+    } catch (err) {
+      console.error("Room creation error:", err);
+      alert("❌ Error creating room.");
+    }
+  };
+
+  const handleJoinRoom = async (data) => {
+      setLoading(true);
+      try {
+          const res=JoinRoom(data);
+  
+        
+        setShowJoinModal(false);
+        setJoinData({ joinCode: "", password: "", isPrivate: false });
+      } catch (err) {
+        setJoinError(err.response?.data?.message || "Failed to join room");
+      }
+      setLoading(false);
+    };
+>>>>>>> 55f74bef50cff890ea1b88672f55ea707ec717cd
 
   return (
     <div className="container-fluid vh-100 bg-dark text-white p-0">
@@ -35,6 +70,8 @@ export default function Dashboard() {
               ownedRooms={userData.ownedRooms}
               joinedRooms={userData.joinedRooms}
               onSelectRoom={(room) => setSelectedRoom(room)}
+              onCreateRoom={handleCreateRoom}
+              onJoinRoom={handleJoinRoom}
             />
           ) : (
             <div className="text-center mt-5 text-secondary">Loading...</div>
