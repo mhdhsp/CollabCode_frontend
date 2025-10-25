@@ -1,94 +1,92 @@
-import React, { useState, useEffect } from "react";
-import LeftSidebar from "../Components/LeftSideBar";
-import { UserRooms } from "../Services/UserService";
-import MainSection from "../Components/MainSection";
-import { CreateNewRoom, JoinRoom } from "../Services/RoomSerive";
+import React, { useEffect, useState } from 'react';
+import ProjectPanel from '../components/dashboard/ProjectPanel';
+import FilesPanel from '../components/dashboard/FilesPanel';
+import EditorPanel from '../components/dashboard/EditorPanel';
+import MembersPanel from '../components/dashboard/MembersPanel';
+import projectService from '../services/api/projectService';
+import userService from '../services/api/userService';
+import { useSelector } from 'react-redux';
 
-export default function Dashboard() {
-  const [userData, setUserData] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
+// Dashboard layout: left (projects), mid-left (files), mid-right editor, right members
+const Dashboard = () => {
+  const [userProjects, setUserProjects] = useState(null);
+  const [activeProject, setActiveProject] = useState(null); // ProjectResDto from Enter endpoint
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch all user rooms (owned + joined)
-  const fetchUserRooms = async () => {
-    try {
-      const data = await UserRooms();
-      setUserData(data);
-      console.log("User Rooms:", data);
-    } catch (err) {
-      console.error("Failed to fetch user rooms:", err);
-    }
-  };
+  const auth = useSelector((s) => s.auth);
+  const userId = auth?.user?.id ?? null;
 
-  // Fetch rooms when the component mounts or when a room is created/selected
   useEffect(() => {
-    fetchUserRooms();
-  }, [selectedRoom]);
+    fetchUserProjects();
+  }, []);
 
-<<<<<<< HEAD
-
-=======
-  // Handle room creation
-  const handleCreateRoom = async (roomData) => {
+  const fetchUserProjects = async () => {
     try {
-      console.log("Creating Room:", roomData);
-      const response = await CreateNewRoom(roomData);
-
-      if (response?.data) {
-        alert("✅ Room created successfully!");
-        await fetchUserRooms(); // refresh sidebar with latest rooms
-      } else {
-        alert("⚠️ Room creation failed.");
-      }
+      setLoadingProjects(true);
+      const res = await userService.getUserRooms();
+      setUserProjects(res);
     } catch (err) {
-      console.error("Room creation error:", err);
-      alert("❌ Error creating room.");
+      setError(err.message || 'Failed to load projects');
+    } finally {
+      setLoadingProjects(false);
     }
   };
 
-  const handleJoinRoom = async (data) => {
-      setLoading(true);
-      try {
-          const res=JoinRoom(data);
-  
-        
-        setShowJoinModal(false);
-        setJoinData({ joinCode: "", password: "", isPrivate: false });
-      } catch (err) {
-        setJoinError(err.response?.data?.message || "Failed to join room");
-      }
-      setLoading(false);
-    };
->>>>>>> 55f74bef50cff890ea1b88672f55ea707ec717cd
+  const enterProject = async (projectId) => {
+    try {
+      const res = await projectService.enterProject(projectId);
+      setActiveProject({ ...res, id: projectId });
+    } catch (err) {
+      setError(err.message || 'Failed to open project');
+    }
+  };
+
+  // after create/join, refresh project list
+  const onProjectsChanged = () => fetchUserProjects();
 
   return (
-    <div className="container-fluid vh-100 bg-dark text-white p-0">
-      <div className="row h-100 g-0">
-        {/* Left Sidebar */}
-        <div className="col-12 col-md-3 col-lg-2 border-end border-secondary">
-          {userData ? (
-            <LeftSidebar
-              ownedRooms={userData.ownedRooms}
-              joinedRooms={userData.joinedRooms}
-              onSelectRoom={(room) => setSelectedRoom(room)}
-              onCreateRoom={handleCreateRoom}
-              onJoinRoom={handleJoinRoom}
-            />
-          ) : (
-            <div className="text-center mt-5 text-secondary">Loading...</div>
-          )}
+    <div className="container-fluid py-4">
+      <div className="row g-3">
+        <div className="col-12">
+          <h3>Dashboard</h3>
         </div>
 
-        {/* Main Section */}
-        <div className="col-12 col-md-9 col-lg-10">
-          {selectedRoom ? (
-            <MainSection selectedRoom={selectedRoom} />
-          ) : (
-            <div className="d-flex justify-content-center align-items-center h-100 text-secondary">
-              Select a room to start coding
-            </div>
-          )}
+        <div className="col-lg-3 col-md-12">
+          <ProjectPanel
+            projects={userProjects}
+            loading={loadingProjects}
+            onEnter={enterProject}
+            onProjectsChanged={onProjectsChanged}
+            activeProjectId={activeProject?.id}
+          />
+        </div>
+
+        <div className="col-lg-2 col-md-12">
+          <FilesPanel
+            project={activeProject}
+            onFileOpen={(file) => { /* EditorPanel will be informed via lifting state below */ }}
+            onProjectChanged={() => enterProject(activeProject?.id)}
+          />
+        </div>
+
+        <div className="col-lg-4 col-md-12">
+          <EditorPanel
+            project={activeProject}
+            onProjectUpdated={() => enterProject(activeProject?.id)}
+          />
+        </div>
+
+        <div className="col-lg-3 col-md-12">
+          <MembersPanel
+            project={activeProject}
+            onProjectChanged={() => enterProject(activeProject?.id)}
+          />
         </div>
       </div>
+      {error && <div className="mt-3 alert alert-danger">{error}</div>}
     </div>
   );
-}
+};
+
+export default Dashboard;

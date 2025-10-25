@@ -1,64 +1,46 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "animate.css"; // for animations
+// src/pages/LandingPage.js
+import React from 'react';
+import LandingHero from "../components/LandingHero";
+import CallToAction from '../components/CallToAction';
+import { useNavigate } from 'react-router-dom';
 
-function LandingPage() {
+const LandingPage = () => {
   const navigate = useNavigate();
-
   return (
-    <div className="d-flex flex-column vh-100 bg-dark text-light">
-      {/* Navbar */}
-      <nav className="navbar navbar-dark bg-dark shadow-sm">
-        <div className="container-fluid">
-          <span className="navbar-brand mb-0 h1">CodeEditor</span>
-          <div>
-            <button
-              className="btn btn-outline-light me-2"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-            <button
-              className="btn btn-outline-light"
-              onClick={() => navigate("/signup")}
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="d-flex flex-grow-1 justify-content-center align-items-center px-3">
-        <div className="text-center">
-          <h1 className="mb-4 animate__animated animate__fadeInDown">
-            Welcome to <span className="text-info">CodeEditor</span>
-          </h1>
-          <p className="mb-5 lead animate__animated animate__fadeInUp">
-            CodeEditor is an online collaborative coding platform where you can create
-            coding rooms, join with friends, and write code together in real-time.
-            Perfect for learning, practicing, and pair programming.
+    <div>
+      <LandingHero />
+      <section className="py-5">
+        <div className="container">
+          <h2 className="h4">Features</h2>
+          <p className="text-muted">
+            Real-time collaboration, instant syncing, and lightweight editor integrations to keep your team productive.
           </p>
 
-          {/* Action Buttons */}
-          <div className="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp animate__delay-1s">
-            <button
-              className="btn btn-primary btn-lg px-5 py-3"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-            <button
-              className="btn btn-success btn-lg px-5 py-3"
-              onClick={() => navigate("/signup")}
-            >
-              Sign Up
-            </button>
+          <div className="row">
+            <div className="col-md-4">
+              <h5>Low Latency</h5>
+              <p className="text-muted">Optimized sync for near-instant updates across teammates.</p>
+            </div>
+            <div className="col-md-4">
+              <h5>Editor Agnostic</h5>
+              <p className="text-muted">Works with your workflow and supports external editors.</p>
+            </div>
+            <div className="col-md-4">
+              <h5>Secure</h5>
+              <p className="text-muted">Authentication and secure transport by default.</p>
+            </div>
           </div>
+
+          <CallToAction
+            primaryText="Get Started"
+            secondaryText="Contact"
+            onPrimary={() => navigate('/signup')}
+            onSecondary={() => navigate('/contact')}
+          />
         </div>
-      </div>
+      </section>
     </div>
   );
-}
+};
 
 export default LandingPage;
