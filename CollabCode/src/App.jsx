@@ -7,6 +7,8 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import ContactPage from './pages/ContactPage';
 import Dashboard from './pages/Dashboard';
+import ProjectListingPage from './pages/ProjectListingPage';
+import ProjectPage from './pages/ProjectPage';
 import PrivateRoute from './components/PrivateRoute';
 import LandingPage from './pages/LandingPage'; // fixed casing
 
@@ -25,6 +27,22 @@ function App() {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <PrivateRoute>
+                <ProjectListingPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/project/:projectId"
+            element={
+              <PrivateRoute>
+                <ProjectPage />
               </PrivateRoute>
             }
           />

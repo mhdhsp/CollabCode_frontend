@@ -1,16 +1,15 @@
 // src/hooks/useAuthRedirect.js
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { selectIsAuthenticated } from '../store/selectors/authSelectors';
+import { useAuth } from '../contexts/AuthContext';
 
 const useAuthRedirect = () => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate('/projects', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 };

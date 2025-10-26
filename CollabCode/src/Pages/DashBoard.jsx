@@ -5,7 +5,7 @@ import EditorPanel from '../components/dashboard/EditorPanel';
 import MembersPanel from '../components/dashboard/MembersPanel';
 import projectService from '../services/api/projectService';
 import userService from '../services/api/userService';
-import { useSelector } from 'react-redux';
+import { useAuth } from '../contexts/AuthContext';
 
 // Dashboard layout: left (projects), mid-left (files), mid-right editor, right members
 const Dashboard = () => {
@@ -14,8 +14,8 @@ const Dashboard = () => {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [error, setError] = useState(null);
 
-  const auth = useSelector((s) => s.auth);
-  const userId = auth?.user?.id ?? null;
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
 
   useEffect(() => {
     fetchUserProjects();

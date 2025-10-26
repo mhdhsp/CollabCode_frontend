@@ -1,19 +1,15 @@
 // src/components/Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated, selectCurrentUser } from '../store/selectors/authSelectors';
-import { performLogout } from '../store/actions/authActions';
+import { useAuth } from '../contexts/AuthContext';
 import logo from '../assets/logo.svg';
 
 function Navbar() {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const user = useSelector(selectCurrentUser);
-  const dispatch = useDispatch();
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await dispatch(performLogout());
+    await logout();
     navigate('/', { replace: true });
   };
 
@@ -64,8 +60,8 @@ function Navbar() {
                   <span className="small text-muted">Hi, {user?.displayName || 'User'}</span>
                 </li>
                 <li className="nav-item">
-                  <Link className="btn btn-primary me-2" to="/dashboard">
-                    Dashboard
+                  <Link className="btn btn-primary me-2" to="/projects">
+                    Projects
                   </Link>
                 </li>
                 <li className="nav-item">

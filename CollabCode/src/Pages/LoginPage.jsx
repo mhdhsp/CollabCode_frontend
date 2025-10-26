@@ -1,14 +1,11 @@
 // src/pages/LoginPage.js
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from '../components/LoginForm';
-import { login } from '../store/actions/authActions';
-import { selectAuthError } from '../store/selectors/authSelectors';
+import { useAuth } from '../contexts/AuthContext';
 import useAuthRedirect from '../hooks/useAuthRedirect';
 
 const LoginPage = () => {
-  const dispatch = useDispatch();
-  const globalError = useSelector(selectAuthError);
+  const { login, error } = useAuth();
   useAuthRedirect(); // redirect if already authenticated
 
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +15,7 @@ const LoginPage = () => {
     setSubmitting(true);
     setFormError(null);
     try {
-      await dispatch(login({ userNameOrEmail, password }));
+      await login({ userNameOrEmail, password });
       // redirect handled by useAuthRedirect or other logic
     } catch (err) {
       setFormError(err.message || 'Login failed');
@@ -33,7 +30,7 @@ const LoginPage = () => {
         <div className="col-md-6">
           <h2>Sign in</h2>
           <p className="text-muted">Welcome back — sign in to continue.</p>
-          <LoginForm onSubmit={handleLogin} submitting={submitting} error={formError || globalError} />
+          <LoginForm onSubmit={handleLogin} submitting={submitting} error={formError || error} />
         </div>
       </div>
     </div>

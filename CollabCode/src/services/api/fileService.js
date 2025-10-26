@@ -21,6 +21,27 @@ const fileService = {
   unassign: async (fileId) => {
     const res = await axiosInstance.post(`/api/File/UnAssign/${fileId}`);
     return res.data.data ?? res.data.Data ?? res.data;
+  },
+  // File Access Control Methods
+  setFileAccess: async (payload) => {
+    // Set file access level (public, private, restricted)
+    const res = await axiosInstance.put('/api/File/Access', payload);
+    return res.data.data ?? res.data.Data ?? res.data;
+  },
+  grantFileAccess: async (payload) => {
+    // Grant specific user access to a file
+    const res = await axiosInstance.post('/api/File/GrantAccess', payload);
+    return res.data.data ?? res.data.Data ?? res.data;
+  },
+  revokeFileAccess: async (payload) => {
+    // Revoke specific user access to a file
+    const res = await axiosInstance.post('/api/File/RevokeAccess', payload);
+    return res.data.data ?? res.data.Data ?? res.data;
+  },
+  getFileAccessList: async (fileId) => {
+    // Get list of users who have access to a file
+    const res = await axiosInstance.get(`/api/File/Access/${fileId}`);
+    return res.data.data ?? res.data.Data ?? res.data;
   }
 };
 

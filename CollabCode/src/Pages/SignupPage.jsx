@@ -1,16 +1,13 @@
 // src/pages/SignupPage.js
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SignupForm from '../components/SignupForm';
-import { signup } from '../store/actions/authActions';
-import { selectAuthError } from '../store/selectors/authSelectors';
+import { useAuth } from '../contexts/AuthContext';
 import useAuthRedirect from '../hooks/useAuthRedirect';
 
 const SignupPage = () => {
-  const dispatch = useDispatch();
+  const { signup, signupStatus } = useAuth();
   const navigate = useNavigate();
-  const globalError = useSelector(selectAuthError);
   useAuthRedirect(); // redirect if already authenticated
 
   const [submitting, setSubmitting] = useState(false);
@@ -23,7 +20,7 @@ const SignupPage = () => {
     setSuccessMsg(null);
 
     try {
-      const res = await dispatch(signup({ userName, email, password }));
+      const res = await signup({ userName, email, password });
       const serverMessage = res?.Message ?? 'Account created successfully. Please sign in.';
       setSuccessMsg(serverMessage);
 
@@ -44,7 +41,7 @@ const SignupPage = () => {
           <p className="text-muted">Join and collaborate in realtime.</p>
 
           {successMsg && <div className="alert alert-success">{successMsg}</div>}
-          <SignupForm onSubmit={handleSignup} submitting={submitting} error={formError || globalError} />
+          <SignupForm onSubmit={handleSignup} submitting={submitting} error={formError || signupStatus.error} />
         </div>
       </div>
     </div>

@@ -1,13 +1,10 @@
 // src/components/PrivateRoute.js
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-
-// adjust selector path/name to match your store
-const selectIsAuthenticated = (state) => state.auth?.isAuthenticated;
+import { useAuth } from '../contexts/AuthContext';
 
 const PrivateRoute = ({ children }) => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
