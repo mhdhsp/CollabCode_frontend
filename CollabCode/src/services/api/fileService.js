@@ -2,45 +2,57 @@ import axiosInstance from './axiosInstance';
 
 const fileService = {
   createFile: async (payload) => {
+    console.log("createFile called with:", payload);
     const res = await axiosInstance.post('/api/File/create', payload);
+    console.log("createFile response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   deleteFile: async (fileId) => {
+    console.log("deleteFile called with fileId:", fileId);
     const res = await axiosInstance.delete(`/api/File/Delete/${fileId}`);
+    console.log("deleteFile response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   updateFile: async (payload) => {
+    console.log("updateFile called with:", payload);
     const res = await axiosInstance.put('/api/File/Update', payload);
+    console.log("updateFile response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   assign: async (payload) => {
-    // your FileService has Assign and UnAssign methods but no controller endpoints shown
+    console.log("assign called with:", payload);
     const res = await axiosInstance.post('/api/File/Assign', payload);
+    console.log("assign response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   unassign: async (fileId) => {
+    console.log("unassign called with fileId:", fileId);
     const res = await axiosInstance.post(`/api/File/UnAssign/${fileId}`);
+    console.log("unassign response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
-  // File Access Control Methods
   setFileAccess: async (payload) => {
-    // Set file access level (public, private, restricted)
+    console.log("setFileAccess called with:", payload);
     const res = await axiosInstance.put('/api/File/Access', payload);
+    console.log("setFileAccess response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   grantFileAccess: async (payload) => {
-    // Grant specific user access to a file
+    console.log("grantFileAccess called with:", payload);
     const res = await axiosInstance.post('/api/File/GrantAccess', payload);
+    console.log("grantFileAccess response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   revokeFileAccess: async (payload) => {
-    // Revoke specific user access to a file
+    console.log("revokeFileAccess called with:", payload);
     const res = await axiosInstance.post('/api/File/RevokeAccess', payload);
+    console.log("revokeFileAccess response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   getFileAccessList: async (fileId) => {
-    // Get list of users who have access to a file
+    console.log("getFileAccessList called with fileId:", fileId);
     const res = await axiosInstance.get(`/api/File/Access/${fileId}`);
+    console.log("getFileAccessList response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   }
 };

@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 import { isEmail } from '../utils/validators';
 
 const LoginForm = ({ onSubmit, submitting, error }) => {
+  console.log('LoginForm component initialized');
   const [userNameOrEmail, setUserNameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({ userNameOrEmail: null, password: null });
 
   const validate = () => {
+    console.log('Validating form inputs');
     const fe = { userNameOrEmail: null, password: null };
     let valid = true;
 
@@ -26,23 +28,31 @@ const LoginForm = ({ onSubmit, submitting, error }) => {
       valid = false;
     }
 
+    console.log('Validation result:', valid, fe);
     setFieldErrors(fe);
     return valid;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Form submission started');
     setLocalError(null);
-    if (!validate()) return;
+    if (!validate()) {
+      console.log('Form validation failed');
+      return;
+    }
 
     try {
+      console.log('Submitting form data:', { userNameOrEmail, password });
       onSubmit({ userNameOrEmail: userNameOrEmail.trim(), password });
     } catch (err) {
+      console.log('Error during submit:', err);
       setLocalError(err?.message || 'Failed to submit.');
     }
   };
 
   const topLevelError = localError || error;
+  console.log('Rendering LoginForm, submitting:', submitting, 'error:', topLevelError);
 
   return (
     <form onSubmit={handleSubmit} noValidate>
@@ -55,6 +65,7 @@ const LoginForm = ({ onSubmit, submitting, error }) => {
           className={`form-control ${fieldErrors.userNameOrEmail ? 'is-invalid' : ''}`}
           value={userNameOrEmail}
           onChange={(e) => {
+            console.log('Username/Email changed:', e.target.value);
             setUserNameOrEmail(e.target.value);
             setFieldErrors((s) => ({ ...s, userNameOrEmail: null }));
           }}
@@ -71,6 +82,7 @@ const LoginForm = ({ onSubmit, submitting, error }) => {
           className={`form-control ${fieldErrors.password ? 'is-invalid' : ''}`}
           value={password}
           onChange={(e) => {
+            console.log('Password changed');
             setPassword(e.target.value);
             setFieldErrors((s) => ({ ...s, password: null }));
           }}

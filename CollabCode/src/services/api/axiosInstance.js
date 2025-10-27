@@ -9,14 +9,34 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(LOCALSTORAGE_TOKEN_KEY);
+    console.log("Request interceptor triggered");
+    const token = localStorage.getItem("token");
+    console.log("from instance" + token);
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Authorization header set", config.headers.Authorization);
+    } else {
+      console.log("No token found in localStorage");
     }
+    console.log("Final request config", config);
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.log("Request interceptor error", error);
+    return Promise.reject(error);
+  }
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log("Response received", response);
+    return response;
+  },
+  (error) => {
+    console.log("Response error", error);
+    return Promise.reject(error);
+  }
 );
 
 export default axiosInstance;

@@ -6,22 +6,30 @@ const FilesPanel = ({ project, onProjectChanged }) => {
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState(null);
 
+  console.log('FilesPanel rendered', { project });
+
   if (!project) {
+    console.log('No project loaded in FilesPanel');
     return <div className="card"><div className="card-body">Open a project to view files</div></div>;
   }
 
   const handleCreateFile = async (e) => {
+    console.log('Create file triggered');
     e.preventDefault();
     setError(null);
     setCreating(true);
     try {
+      console.log('Creating file with name:', fileName, 'for project:', project.id);
       await fileService.createFile({ fileName, projectId: project.id });
+      console.log('File created successfully');
       setFileName('');
       onProjectChanged();
     } catch (err) {
+      console.error('Error creating file:', err);
       setError(err.message || 'Create failed');
     } finally {
       setCreating(false);
+      console.log('Create file process ended');
     }
   };
 

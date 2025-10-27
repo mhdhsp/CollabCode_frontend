@@ -4,15 +4,26 @@ import projectService from '../../services/api/projectService';
 const MembersPanel = ({ project, onProjectChanged }) => {
   const [error, setError] = useState(null);
 
-  if (!project) return <div className="card"><div className="card-body">Open a project to view members</div></div>;
+  console.log('MembersPanel rendered', { project });
+
+  if (!project) {
+    console.log('No project loaded in MembersPanel');
+    return <div className="card"><div className="card-body">Open a project to view members</div></div>;
+  }
 
   const removeMember = async (memberDto) => {
-    if (!confirm(`Remove ${memberDto.userName}?`)) return;
+    console.log('Remove member triggered', memberDto);
+    if (!confirm(`Remove ${memberDto.userName}?`)) {
+      console.log('Remove member cancelled');
+      return;
+    }
     try {
-      // recommended endpoint: DELETE /api/Project/Member/{projectId}/{memberId}
+      console.log('Removing member from project:', project.id, 'memberId:', memberDto.id);
       await projectService.removeMember(project.id, memberDto.id);
+      console.log('Member removed successfully');
       onProjectChanged();
     } catch (err) {
+      console.error('Error removing member:', err);
       setError(err.message || 'Remove failed');
     }
   };

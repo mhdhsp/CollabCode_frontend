@@ -1,56 +1,66 @@
-// src/pages/ProjectPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProjectFilesSection from '../components/project/ProjectFilesSection';
 import ProjectEditorSection from '../components/project/ProjectEditorSection';
 import ProjectMembersSection from '../components/project/ProjectMembersSection';
 import projectService from '../services/api/projectService';
-import { useAuth } from '../contexts/AuthContext';
+import { getCurrentUser } from '../utils/authUtils';
 
 const ProjectPage = () => {
+  console.log("ProjectPage component rendered");
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const user = getCurrentUser();
+  console.log("Current user:", user);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeFile, setActiveFile] = useState(null);
 
   useEffect(() => {
+    console.log("useEffect triggered with projectId:", projectId);
     if (projectId) {
       fetchProject();
     }
   }, [projectId]);
 
   const fetchProject = async () => {
+    console.log("Fetching project data for:", projectId);
     try {
       setLoading(true);
       const res = await projectService.enterProject(projectId);
+      console.log("Project data fetched successfully:", res);
       setProject({ ...res, id: projectId });
-      // Set first file as active if available
       if (res.files && res.files.length > 0) {
+        console.log("Setting first file as active:", res.files[0]);
         setActiveFile(res.files[0]);
       }
     } catch (err) {
+      console.log("Error fetching project:", err);
       setError(err.message || 'Failed to load project');
     } finally {
+      console.log("Fetch project completed");
       setLoading(false);
     }
   };
 
   const handleFileSelect = (file) => {
+    console.log("File selected:", file);
     setActiveFile(file);
   };
 
   const handleProjectUpdate = () => {
+    console.log("Project update triggered");
     fetchProject();
   };
 
   const handleBackToProjects = () => {
+    console.log("Navigating back to project listing");
     navigate('/projects');
   };
 
   if (loading) {
+    console.log("Loading project...");
     return (
       <div className="container-fluid py-4">
         <div className="text-center">
@@ -64,6 +74,7 @@ const ProjectPage = () => {
   }
 
   if (error) {
+    console.log("Rendering error message:", error);
     return (
       <div className="container-fluid py-4">
         <div className="alert alert-danger">
@@ -78,6 +89,7 @@ const ProjectPage = () => {
   }
 
   if (!project) {
+    console.log("Project not found or unauthorized access");
     return (
       <div className="container-fluid py-4">
         <div className="alert alert-warning">
@@ -92,10 +104,11 @@ const ProjectPage = () => {
   }
 
   const isOwner = project.ownerId === user?.id;
+  console.log("Rendering project:", project);
+  console.log("Is user owner:", isOwner);
 
   return (
     <div className="container-fluid py-4">
-      {/* Project Header */}
       <div className="row mb-3">
         <div className="col-12">
           <div className="d-flex justify-content-between align-items-center">
@@ -113,12 +126,17 @@ const ProjectPage = () => {
                 <button 
                   className="btn btn-outline-danger"
                   onClick={() => {
+                    console.log("Attempting to delete project:", projectId);
                     if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
                       projectService.destroyProject(projectId).then(() => {
+                        console.log("Project deleted successfully");
                         navigate('/projects');
                       }).catch(err => {
+                        console.log("Error deleting project:", err);
                         setError(err.message || 'Failed to delete project');
                       });
+                    } else {
+                      console.log("Delete project canceled by user");
                     }
                   }}
                 >
@@ -130,9 +148,7 @@ const ProjectPage = () => {
         </div>
       </div>
 
-      {/* Three Column Layout */}
       <div className="row g-3">
-        {/* Project Files Section - Smaller */}
         <div className="col-lg-2 col-md-12">
           <ProjectFilesSection
             project={project}
@@ -143,7 +159,6 @@ const ProjectPage = () => {
           />
         </div>
 
-        {/* Editor Section - Maximum space */}
         <div className="col-lg-7 col-md-12">
           <ProjectEditorSection
             project={project}
@@ -153,7 +168,6 @@ const ProjectPage = () => {
           />
         </div>
 
-        {/* Members Section - Smaller */}
         <div className="col-lg-3 col-md-12">
           <ProjectMembersSection
             project={project}

@@ -1,4 +1,3 @@
-// src/pages/ProjectListingPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProjectCreateModal from '../components/dashboard/ProjectCreateModal';
@@ -7,6 +6,7 @@ import userService from '../services/api/userService';
 import projectService from '../services/api/projectService';
 
 const ProjectListingPage = () => {
+  console.log("ProjectListingPage component rendered");
   const [projects, setProjects] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,46 +15,66 @@ const ProjectListingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("useEffect triggered");
+    console.log("Token:", localStorage.getItem("token"));
     fetchUserProjects();
   }, []);
 
   const fetchUserProjects = async () => {
+    console.log("Fetching user projects...");
     try {
       setLoading(true);
-      const res = await userService.getUserRooms();
+      const res = await userService.getUserProjects();
+      console.log("Projects fetched successfully:", res);
       setProjects(res);
     } catch (err) {
+      console.log("Error fetching projects:", err);
       setError(err.message || 'Failed to load projects');
     } finally {
+      console.log("Fetch user projects completed");
       setLoading(false);
     }
   };
 
   const handleProjectSelect = (projectId) => {
+    console.log("Project selected:", projectId);
     navigate(`/project/${projectId}`);
   };
 
   const handleLeaveProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to leave this project?')) return;
+    console.log("Attempting to leave project:", projectId);
+    if (!window.confirm('Are you sure you want to leave this project?')) {
+      console.log("Leave project canceled by user");
+      return;
+    }
     try {
       await projectService.leaveProject(projectId);
-      fetchUserProjects(); // Refresh the list
+      console.log("Left project successfully");
+      fetchUserProjects();
     } catch (err) {
+      console.log("Error leaving project:", err);
       setError(err.message || 'Failed to leave project');
     }
   };
 
   const handleDestroyProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+    console.log("Attempting to delete project:", projectId);
+    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      console.log("Delete project canceled by user");
+      return;
+    }
     try {
       await projectService.destroyProject(projectId);
-      fetchUserProjects(); // Refresh the list
+      console.log("Deleted project successfully");
+      fetchUserProjects();
     } catch (err) {
+      console.log("Error deleting project:", err);
       setError(err.message || 'Failed to delete project');
     }
   };
 
   if (loading) {
+    console.log("Loading projects...");
     return (
       <div className="container py-5">
         <div className="text-center">
@@ -67,6 +87,7 @@ const ProjectListingPage = () => {
     );
   }
 
+  console.log("Rendering project list");
   return (
     <div className="container py-5">
       <div className="row">
@@ -74,10 +95,10 @@ const ProjectListingPage = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>My Projects</h2>
             <div>
-              <button className="btn btn-primary me-2" onClick={() => setShowCreate(true)}>
+              <button className="btn btn-primary me-2" onClick={() => { console.log("Opening create modal"); setShowCreate(true); }}>
                 <i className="bi bi-plus-circle"></i> Create Project
               </button>
-              <button className="btn btn-outline-secondary" onClick={() => setShowJoin(true)}>
+              <button className="btn btn-outline-secondary" onClick={() => { console.log("Opening join modal"); setShowJoin(true); }}>
                 <i className="bi bi-people"></i> Join Project
               </button>
             </div>
@@ -86,7 +107,6 @@ const ProjectListingPage = () => {
           {error && <div className="alert alert-danger">{error}</div>}
 
           <div className="row">
-            {/* Owned Projects */}
             <div className="col-md-6 mb-4">
               <div className="card">
                 <div className="card-header">
@@ -100,7 +120,7 @@ const ProjectListingPage = () => {
                     <div className="text-center text-muted py-4">
                       <i className="bi bi-folder-x fs-1"></i>
                       <p className="mt-2">No owned projects yet</p>
-                      <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
+                      <button className="btn btn-primary" onClick={() => { console.log("Creating first project"); setShowCreate(true); }}>
                         Create Your First Project
                       </button>
                     </div>
@@ -136,7 +156,6 @@ const ProjectListingPage = () => {
               </div>
             </div>
 
-            {/* Joined Projects */}
             <div className="col-md-6 mb-4">
               <div className="card">
                 <div className="card-header">
@@ -150,7 +169,7 @@ const ProjectListingPage = () => {
                     <div className="text-center text-muted py-4">
                       <i className="bi bi-person-plus fs-1"></i>
                       <p className="mt-2">No joined projects yet</p>
-                      <button className="btn btn-outline-secondary" onClick={() => setShowJoin(true)}>
+                      <button className="btn btn-outline-secondary" onClick={() => { console.log("Joining a project"); setShowJoin(true); }}>
                         Join a Project
                       </button>
                     </div>
@@ -189,10 +208,10 @@ const ProjectListingPage = () => {
         </div>
       </div>
 
-      {/* Modals */}
       <ProjectCreateModal 
         show={showCreate} 
         onClose={() => { 
+          console.log("Closing create modal and refreshing projects");
           setShowCreate(false); 
           fetchUserProjects(); 
         }} 
@@ -200,6 +219,7 @@ const ProjectListingPage = () => {
       <ProjectJoinModal 
         show={showJoin} 
         onClose={() => { 
+          console.log("Closing join modal and refreshing projects");
           setShowJoin(false); 
           fetchUserProjects(); 
         }} 

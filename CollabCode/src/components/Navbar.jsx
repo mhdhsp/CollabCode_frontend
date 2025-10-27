@@ -1,12 +1,11 @@
-// src/components/Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { isAuthenticated, getCurrentUser, logout } from '../utils/authUtils';  // Changed import
 import logo from '../assets/logo.svg';
 
 function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const user = getCurrentUser();  // Use util
 
   const handleLogout = async () => {
     await logout();
@@ -41,7 +40,7 @@ function Navbar() {
                 Contact
               </Link>
             </li>
-            {!isAuthenticated ? (
+            {!isAuthenticated() ? (  // Use util
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/signup">

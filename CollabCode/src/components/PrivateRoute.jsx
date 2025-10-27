@@ -1,14 +1,11 @@
-// src/components/PrivateRoute.js
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { isAuthenticated } from '../utils/authUtils';  // Changed to util
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  if (!isAuthenticated) {
-    // Redirect to login and preserve intended location in state
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

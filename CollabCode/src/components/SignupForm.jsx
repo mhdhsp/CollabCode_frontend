@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { isEmail, minLength } from '../utils/validators';
 
 const SignupForm = ({ onSubmit, submitting, error }) => {
+  console.log('SignupForm component initialized');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,6 +12,7 @@ const SignupForm = ({ onSubmit, submitting, error }) => {
   const [fieldErrors, setFieldErrors] = useState({ userName: null, email: null, password: null });
 
   const validate = () => {
+    console.log('Validating signup form inputs');
     const fe = { userName: null, email: null, password: null };
     let valid = true;
 
@@ -32,23 +34,31 @@ const SignupForm = ({ onSubmit, submitting, error }) => {
       valid = false;
     }
 
+    console.log('Validation result:', valid, fe);
     setFieldErrors(fe);
     return valid;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Signup form submission started');
     setLocalError(null);
-    if (!validate()) return;
+    if (!validate()) {
+      console.log('Signup form validation failed');
+      return;
+    }
 
     try {
+      console.log('Submitting signup data:', { userName, email, password });
       onSubmit({ userName: userName.trim(), email: email.trim(), password });
     } catch (err) {
+      console.log('Error during signup submit:', err);
       setLocalError(err?.message || 'Failed to submit.');
     }
   };
 
   const topLevelError = localError || error;
+  console.log('Rendering SignupForm, submitting:', submitting, 'error:', topLevelError);
 
   return (
     <form onSubmit={handleSubmit} noValidate>
@@ -61,6 +71,7 @@ const SignupForm = ({ onSubmit, submitting, error }) => {
           className={`form-control ${fieldErrors.userName ? 'is-invalid' : ''}`}
           value={userName}
           onChange={(e) => {
+            console.log('Username changed:', e.target.value);
             setUserName(e.target.value);
             setFieldErrors((s) => ({ ...s, userName: null }));
           }}
@@ -77,6 +88,7 @@ const SignupForm = ({ onSubmit, submitting, error }) => {
           className={`form-control ${fieldErrors.email ? 'is-invalid' : ''}`}
           value={email}
           onChange={(e) => {
+            console.log('Email changed:', e.target.value);
             setEmail(e.target.value);
             setFieldErrors((s) => ({ ...s, email: null }));
           }}
@@ -92,6 +104,7 @@ const SignupForm = ({ onSubmit, submitting, error }) => {
           className={`form-control ${fieldErrors.password ? 'is-invalid' : ''}`}
           value={password}
           onChange={(e) => {
+            console.log('Password changed');
             setPassword(e.target.value);
             setFieldErrors((s) => ({ ...s, password: null }));
           }}

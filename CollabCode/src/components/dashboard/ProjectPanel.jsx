@@ -8,7 +8,12 @@ const ProjectPanel = ({ projects, loading, onEnter, onProjectsChanged, activePro
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
 
-  const handleEnter = (projectId) => onEnter(projectId);
+  console.log('ProjectPanel rendered', { projects, loading, activeProjectId });
+
+  const handleEnter = (projectId) => {
+    console.log('Entering project', projectId);
+    onEnter(projectId);
+  };
 
   return (
     <div className="card h-100">
@@ -16,8 +21,8 @@ const ProjectPanel = ({ projects, loading, onEnter, onProjectsChanged, activePro
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h5 className="card-title mb-0">Projects</h5>
           <div>
-            <button className="btn btn-sm btn-outline-primary me-1" onClick={() => setShowCreate(true)}>New</button>
-            <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowJoin(true)}>Join</button>
+            <button className="btn btn-sm btn-outline-primary me-1" onClick={() => { console.log('Open create modal'); setShowCreate(true); }}>New</button>
+            <button className="btn btn-sm btn-outline-secondary" onClick={() => { console.log('Open join modal'); setShowJoin(true); }}>Join</button>
           </div>
         </div>
 
@@ -72,8 +77,8 @@ const ProjectPanel = ({ projects, loading, onEnter, onProjectsChanged, activePro
         </div>
       </div>
 
-      <ProjectCreateModal show={showCreate} onClose={() => { setShowCreate(false); onProjectsChanged(); }} />
-      <ProjectJoinModal show={showJoin} onClose={() => { setShowJoin(false); onProjectsChanged(); }} />
+      <ProjectCreateModal show={showCreate} onClose={() => { console.log('Closing create modal'); setShowCreate(false); onProjectsChanged(); }} />
+      <ProjectJoinModal show={showJoin} onClose={() => { console.log('Closing join modal'); setShowJoin(false); onProjectsChanged(); }} />
     </div>
   );
 };

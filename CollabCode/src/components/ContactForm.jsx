@@ -13,6 +13,7 @@ const ContactForm = ({ onSuccess }) => {
   const [successMsg, setSuccessMsg] = useState(null);
 
   const validate = () => {
+    console.log('Validating form fields');
     const fe = { name: null, email: null, message: null };
     let ok = true;
     if (!name.trim()) { fe.name = 'Name is required.'; ok = false; }
@@ -20,31 +21,33 @@ const ContactForm = ({ onSuccess }) => {
     else if (!isEmail(email)) { fe.email = 'Please enter a valid email.'; ok = false; }
     if (!minLength(message, 10)) { fe.message = 'Message must be at least 10 characters.'; ok = false; }
     setFieldErrors(fe);
+    console.log('Validation result:', ok, fe);
     return ok;
   };
 
   const handleSubmit = async (e) => {
+    console.log('Form submit triggered');
     e.preventDefault();
     setTopError(null);
     setSuccessMsg(null);
     if (!validate()) return;
 
     setSubmitting(true);
+    console.log('Submitting form with data:', { name, email, message });
     try {
-      // If you have a backend endpoint, adjust the route as needed (e.g. /api/Contact)
       const payload = { name: name.trim(), email: email.trim(), message: message.trim() };
-
-      // Try calling backend; if it's not available this will throw and fallback to local success
+      console.log('Payload prepared:', payload);
       await axiosInstance.post('/api/Contact', payload);
-
+      console.log('Form submission successful');
       setSuccessMsg('Message sent — we will get back to you shortly.');
       setName(''); setEmail(''); setMessage('');
       if (onSuccess) onSuccess();
     } catch (err) {
-      // If backend isn't implemented, still show a success-like fallback or show helpful error
+      console.error('Error submitting form:', err);
       const serverMsg = err.response?.data?.Message || err.response?.data?.message || err.message;
       setTopError(serverMsg || 'Failed to send message. If this persists, contact admin@example.com.');
     } finally {
+      console.log('Submission process ended');
       setSubmitting(false);
     }
   };

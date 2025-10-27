@@ -5,7 +5,7 @@ import EditorPanel from '../components/dashboard/EditorPanel';
 import MembersPanel from '../components/dashboard/MembersPanel';
 import projectService from '../services/api/projectService';
 import userService from '../services/api/userService';
-import { useAuth } from '../contexts/AuthContext';
+import { getCurrentUser } from '../utils/authUtils';  // Changed import
 
 // Dashboard layout: left (projects), mid-left (files), mid-right editor, right members
 const Dashboard = () => {
@@ -14,38 +14,50 @@ const Dashboard = () => {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [error, setError] = useState(null);
 
-  const { user } = useAuth();
+  const user = getCurrentUser();  // Use util
   const userId = user?.id ?? null;
   console.log("from dash"+userId);
-  
+  console.log("Dashboard component rendered");
 
   useEffect(() => {
+    console.log("useEffect - fetchUserProjects called");
     fetchUserProjects();
   }, []);
 
   const fetchUserProjects = async () => {
+    console.log("fetchUserProjects started");
     try {
       setLoadingProjects(true);
       const res = await userService.getUserRooms();
+      console.log("fetchUserProjects success", res);
       setUserProjects(res);
     } catch (err) {
+      console.log("fetchUserProjects failed", err);
       setError(err.message || 'Failed to load projects');
     } finally {
+      console.log("fetchUserProjects finally");
       setLoadingProjects(false);
     }
   };
 
   const enterProject = async (projectId) => {
+    console.log("enterProject called with", projectId);
     try {
       const res = await projectService.enterProject(projectId);
+      console.log("enterProject success", res);
       setActiveProject({ ...res, id: projectId });
     } catch (err) {
+      console.log("enterProject failed", err);
       setError(err.message || 'Failed to open project');
     }
   };
 
-  // after create/join, refresh project list
-  const onProjectsChanged = () => fetchUserProjects();
+  const onProjectsChanged = () => {
+    console.log("onProjectsChanged called");
+    fetchUserProjects();
+  };
+
+  console.log("Rendering Dashboard UI", { userProjects, activeProject, loadingProjects });
 
   return (
     <div className="container-fluid py-4">
@@ -67,22 +79,22 @@ const Dashboard = () => {
         <div className="col-lg-2 col-md-12">
           <FilesPanel
             project={activeProject}
-            onFileOpen={(file) => { /* EditorPanel will be informed via lifting state below */ }}
-            onProjectChanged={() => enterProject(activeProject?.id)}
+            onFileOpen={(file) => { console.log("onFileOpen called", file); }}
+            onProjectChanged={() => { console.log("FilesPanel onProjectChanged"); enterProject(activeProject?.id); }}
           />
         </div>
 
         <div className="col-lg-4 col-md-12">
           <EditorPanel
             project={activeProject}
-            onProjectUpdated={() => enterProject(activeProject?.id)}
+            onProjectUpdated={() => { console.log("EditorPanel onProjectUpdated"); enterProject(activeProject?.id); }}
           />
         </div>
 
         <div className="col-lg-3 col-md-12">
           <MembersPanel
             project={activeProject}
-            onProjectChanged={() => enterProject(activeProject?.id)}
+            onProjectChanged={() => { console.log("MembersPanel onProjectChanged"); enterProject(activeProject?.id); }}
           />
         </div>
       </div>

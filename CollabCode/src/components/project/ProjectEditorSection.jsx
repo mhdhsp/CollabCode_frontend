@@ -1,4 +1,3 @@
-// src/components/project/ProjectEditorSection.jsx
 import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
 import fileService from '../../services/api/fileService';
@@ -8,7 +7,10 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
   const [editing, setEditing] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
 
+  console.log('ProjectEditorSection rendered', { project, activeFile, currentUserId });
+
   React.useEffect(() => {
+    console.log('Active file changed', activeFile);
     if (activeFile) {
       setContent(activeFile.content || '');
     } else {
@@ -17,42 +19,32 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
   }, [activeFile]);
 
   const canEdit = (file) => {
+    console.log('Checking canEdit', file);
     if (!file) return false;
-    
-    // Owner can always edit
     if (project.ownerId === currentUserId) return true;
-    
-    // Check if file is assigned to current user
     if (file.assignedTo !== null && Number(file.assignedTo) === Number(currentUserId)) {
-      // Check file access level
-      if (file.accessLevel === 'private') return false; // Only owner can edit private files
+      if (file.accessLevel === 'private') return false;
       if (file.accessLevel === 'restricted') {
-        // Check if user has explicit access (this would need backend validation)
-        return true; // For now, assume assigned users can edit restricted files
+        return true;
       }
-      return true; // Public files can be edited by assigned users
+      return true;
     }
-    
     return false;
   };
 
   const canView = (file) => {
+    console.log('Checking canView', file);
     if (!file) return false;
-    
-    // Owner can always view
     if (project.ownerId === currentUserId) return true;
-    
-    // Check file access level
-    if (file.accessLevel === 'private') return false; // Only owner can view private files
+    if (file.accessLevel === 'private') return false;
     if (file.accessLevel === 'restricted') {
-      // Check if user has explicit access (this would need backend validation)
-      return true; // For now, assume project members can view restricted files
+      return true;
     }
-    
-    return true; // Public files can be viewed by all project members
+    return true;
   };
 
   const handleSave = async () => {
+    console.log('Saving file', activeFile);
     if (!activeFile) return;
     setStatusMsg(null);
     setEditing(true);
@@ -63,9 +55,11 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
         content,
         projectId: project.id,
       });
+      console.log('File saved successfully');
       setStatusMsg('Saved successfully');
       onProjectUpdate();
     } catch (err) {
+      console.error('Save failed', err);
       setStatusMsg(err?.message || 'Save failed');
     } finally {
       setEditing(false);
@@ -74,6 +68,7 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
   };
 
   const handleRename = async () => {
+    console.log('Renaming file', activeFile);
     if (!activeFile) return;
     const newName = window.prompt('New filename', activeFile.fileName);
     if (!newName || newName.trim() === '') return;
@@ -84,13 +79,16 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
         content,
         projectId: project.id,
       });
+      console.log('File renamed successfully');
       onProjectUpdate();
     } catch (err) {
+      console.error('Rename failed', err);
       setStatusMsg(err?.message || 'Rename failed');
     }
   };
 
   if (!project) {
+    console.log('No project selected');
     return (
       <div className="card h-100">
         <div className="card-body d-flex align-items-center justify-content-center">
@@ -132,7 +130,6 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
         </div>
       </div>
       <div className="card-body d-flex flex-column">
-        {/* File Info */}
         {activeFile && (
           <div className="mb-3">
             <div className="d-flex justify-content-between align-items-center">
@@ -166,8 +163,6 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
             </div>
           </div>
         )}
-
-        {/* Editor */}
         <div className="flex-grow-1" style={{ minHeight: 500 }}>
           {activeFile ? (
             !canView(activeFile) ? (
@@ -183,7 +178,7 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
                 height="70vh"
                 defaultLanguage="javascript"
                 value={content}
-                onChange={(value) => setContent(value ?? '')}
+                onChange={(value) => { console.log('Content changed'); setContent(value ?? ''); }}
                 options={{ 
                   readOnly: !canEdit(activeFile), 
                   automaticLayout: true,
@@ -214,8 +209,6 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
             </div>
           )}
         </div>
-
-        {/* Status Message */}
         {statusMsg && (
           <div className="mt-2">
             <div className={`alert ${statusMsg.includes('success') ? 'alert-success' : 'alert-danger'} mb-0`}>
@@ -223,8 +216,6 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
             </div>
           </div>
         )}
-
-        {/* Instructions */}
         {!activeFile && (
           <div className="mt-3 text-muted small">
             <i className="bi bi-info-circle"></i> Select a file from the left panel to start editing

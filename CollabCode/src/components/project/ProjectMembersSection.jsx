@@ -1,4 +1,3 @@
-// src/components/project/ProjectMembersSection.jsx
 import React, { useState } from 'react';
 import projectService from '../../services/api/projectService';
 
@@ -8,8 +7,10 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
   const [showAddMember, setShowAddMember] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [password, setPassword] = useState('');
+  console.log("ProjectMembersSection render", { project, isOwner });
 
   const handleRemoveMember = async (memberId) => {
+    console.log("handleRemoveMember called", memberId);
     if (!isOwner) {
       setError('Only project owners can remove members');
       return;
@@ -17,14 +18,18 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
 
     if (!window.confirm('Are you sure you want to remove this member?')) return;
     try {
+      console.log("Removing member...");
       await projectService.removeMember(project.id, memberId);
+      console.log("Member removed successfully");
       onProjectUpdate();
     } catch (err) {
+      console.error("Error removing member", err);
       setError(err.message || 'Failed to remove member');
     }
   };
 
   const handleLeaveProject = async () => {
+    console.log("handleLeaveProject called");
     if (isOwner) {
       setError('Project owners cannot leave their own project');
       return;
@@ -32,33 +37,40 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
 
     if (!window.confirm('Are you sure you want to leave this project?')) return;
     try {
+      console.log("Leaving project...");
       await projectService.leaveProject(project.id);
-      // Redirect to projects page after leaving
+      console.log("Left project successfully");
       window.location.href = '/projects';
     } catch (err) {
+      console.error("Error leaving project", err);
       setError(err.message || 'Failed to leave project');
     }
   };
 
   const handleAddMember = async (e) => {
     e.preventDefault();
+    console.log("handleAddMember called", { joinCode, password });
     if (!isOwner) {
       setError('Only project owners can add members');
       return;
     }
 
     try {
+      console.log("Adding member...");
       await projectService.joinProject({ joinCode, password });
+      console.log("Member added successfully");
       setJoinCode('');
       setPassword('');
       setShowAddMember(false);
       onProjectUpdate();
     } catch (err) {
+      console.error("Error adding member", err);
       setError(err.message || 'Failed to add member');
     }
   };
 
   const copyJoinCode = () => {
+    console.log("copyJoinCode called", project.joinCode);
     navigator.clipboard.writeText(project.joinCode);
     setShowJoinCode(true);
     setTimeout(() => setShowJoinCode(false), 2000);
@@ -74,7 +86,7 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
         {isOwner && (
           <button 
             className="btn btn-sm btn-outline-primary"
-            onClick={() => setShowAddMember(!showAddMember)}
+            onClick={() => { console.log("Toggle showAddMember"); setShowAddMember(!showAddMember); }}
             title="Add member"
           >
             <i className="bi bi-person-plus"></i>
@@ -82,7 +94,6 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
         )}
       </div>
       <div className="card-body d-flex flex-column p-2">
-        {/* Join Code Section */}
         {isOwner && (
           <div className="mb-2">
             <label className="form-label small">Join Code</label>
@@ -109,7 +120,6 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
           </div>
         )}
 
-        {/* Add Member Form */}
         {isOwner && showAddMember && (
           <div className="mb-2">
             <form onSubmit={handleAddMember}>
@@ -143,6 +153,7 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
                   className="btn btn-sm btn-outline-secondary" 
                   type="button"
                   onClick={() => {
+                    console.log("Cancel add member");
                     setShowAddMember(false);
                     setJoinCode('');
                     setPassword('');
@@ -155,7 +166,6 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
           </div>
         )}
 
-        {/* Members List */}
         <div className="flex-grow-1" style={{ maxHeight: '300px', overflowY: 'auto' }}>
           {project.members?.length === 0 ? (
             <div className="text-center text-muted py-3">
@@ -197,12 +207,10 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
           )}
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="alert alert-danger small mb-2">{error}</div>
         )}
 
-        {/* Leave Project Button */}
         {!isOwner && (
           <div className="mt-2">
             <button 
@@ -214,7 +222,6 @@ const ProjectMembersSection = ({ project, onProjectUpdate, isOwner }) => {
           </div>
         )}
 
-        {/* Owner Info */}
         {isOwner && (
           <div className="text-muted small mt-2">
             <i className="bi bi-info-circle"></i> Owner controls available

@@ -1,8 +1,8 @@
-// src/components/project/ProjectFilesSection.jsx
 import React, { useState } from 'react';
 import fileService from '../../services/api/fileService';
 
 const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdate, isOwner }) => {
+  console.log('ProjectFilesSection rendered', { project, activeFile, isOwner });
   const [creating, setCreating] = useState(false);
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState(null);
@@ -11,6 +11,7 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
   const [fileAccessList, setFileAccessList] = useState({});
 
   const handleCreateFile = async (e) => {
+    console.log('handleCreateFile called', { fileName });
     e.preventDefault();
     if (!isOwner) {
       setError('Only project owners can create files');
@@ -20,11 +21,14 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
     setError(null);
     setCreating(true);
     try {
+      console.log('Creating file...');
       await fileService.createFile({ fileName, projectId: project.id });
+      console.log('File created successfully');
       setFileName('');
       setShowCreateForm(false);
       onProjectUpdate();
     } catch (err) {
+      console.error('Error creating file', err);
       setError(err.message || 'Failed to create file');
     } finally {
       setCreating(false);
@@ -32,6 +36,7 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
   };
 
   const handleDeleteFile = async (fileId) => {
+    console.log('handleDeleteFile called', { fileId });
     if (!isOwner) {
       setError('Only project owners can delete files');
       return;
@@ -40,13 +45,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
     if (!window.confirm('Are you sure you want to delete this file?')) return;
     try {
       await fileService.deleteFile(fileId);
+      console.log('File deleted successfully', fileId);
       onProjectUpdate();
     } catch (err) {
+      console.error('Error deleting file', err);
       setError(err.message || 'Failed to delete file');
     }
   };
 
   const handleAssignFile = async (fileId) => {
+    console.log('handleAssignFile called', { fileId });
     if (!isOwner) {
       setError('Only project owners can assign files');
       return;
@@ -57,13 +65,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
     
     try {
       await fileService.assign({ fileId, targetUserId: userId });
+      console.log('File assigned successfully', { fileId, userId });
       onProjectUpdate();
     } catch (err) {
+      console.error('Error assigning file', err);
       setError(err.message || 'Failed to assign file');
     }
   };
 
   const handleUnassignFile = async (fileId) => {
+    console.log('handleUnassignFile called', { fileId });
     if (!isOwner) {
       setError('Only project owners can unassign files');
       return;
@@ -71,13 +82,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
 
     try {
       await fileService.unassign(fileId);
+      console.log('File unassigned successfully', fileId);
       onProjectUpdate();
     } catch (err) {
+      console.error('Error unassigning file', err);
       setError(err.message || 'Failed to unassign file');
     }
   };
 
   const handleRenameFile = async (fileId, currentName) => {
+    console.log('handleRenameFile called', { fileId, currentName });
     if (!isOwner) {
       setError('Only project owners can rename files');
       return;
@@ -93,13 +107,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
         content: project.files.find(f => f.id === fileId)?.content || '',
         projectId: project.id,
       });
+      console.log('File renamed successfully', { fileId, newName });
       onProjectUpdate();
     } catch (err) {
+      console.error('Error renaming file', err);
       setError(err.message || 'Failed to rename file');
     }
   };
 
   const handleSetFileAccess = async (fileId, accessLevel) => {
+    console.log('handleSetFileAccess called', { fileId, accessLevel });
     if (!isOwner) {
       setError('Only project owners can set file access');
       return;
@@ -107,13 +124,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
 
     try {
       await fileService.setFileAccess({ fileId, accessLevel });
+      console.log('File access set successfully', { fileId, accessLevel });
       onProjectUpdate();
     } catch (err) {
+      console.error('Error setting file access', err);
       setError(err.message || 'Failed to set file access');
     }
   };
 
   const handleGrantFileAccess = async (fileId) => {
+    console.log('handleGrantFileAccess called', { fileId });
     if (!isOwner) {
       setError('Only project owners can grant file access');
       return;
@@ -124,13 +144,16 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
     
     try {
       await fileService.grantFileAccess({ fileId, userId });
+      console.log('File access granted', { fileId, userId });
       onProjectUpdate();
     } catch (err) {
+      console.error('Error granting file access', err);
       setError(err.message || 'Failed to grant file access');
     }
   };
 
   const handleRevokeFileAccess = async (fileId, userId) => {
+    console.log('handleRevokeFileAccess called', { fileId, userId });
     if (!isOwner) {
       setError('Only project owners can revoke file access');
       return;
@@ -140,28 +163,35 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
     
     try {
       await fileService.revokeFileAccess({ fileId, userId });
+      console.log('File access revoked', { fileId, userId });
       onProjectUpdate();
     } catch (err) {
+      console.error('Error revoking file access', err);
       setError(err.message || 'Failed to revoke file access');
     }
   };
 
   const loadFileAccessList = async (fileId) => {
+    console.log('loadFileAccessList called', { fileId });
     try {
       const accessList = await fileService.getFileAccessList(fileId);
+      console.log('File access list loaded', accessList);
       setFileAccessList(prev => ({ ...prev, [fileId]: accessList }));
     } catch (err) {
+      console.error('Error loading file access list', err);
       setError(err.message || 'Failed to load file access list');
     }
   };
 
   const getFileAccessIcon = (file) => {
+    console.log('getFileAccessIcon', { file });
     if (file.accessLevel === 'private') return '🔒';
     if (file.accessLevel === 'restricted') return '👥';
     return '🌐';
   };
 
   const getFileAccessTooltip = (file) => {
+    console.log('getFileAccessTooltip', { file });
     if (file.accessLevel === 'private') return 'Private - Owner only';
     if (file.accessLevel === 'restricted') return 'Restricted - Specific users';
     return 'Public - All project members';
@@ -185,7 +215,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
         )}
       </div>
       <div className="card-body d-flex flex-column p-2">
-        {/* Create File Form */}
         {isOwner && showCreateForm && (
           <div className="mb-2">
             <form onSubmit={handleCreateFile}>
@@ -218,8 +247,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
             </form>
           </div>
         )}
-
-        {/* File List */}
         <div className="flex-grow-1" style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {project.files?.length === 0 ? (
             <div className="text-center text-muted py-3">
@@ -231,11 +258,12 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
               {project.files.map(file => (
                 <div 
                   key={file.id} 
-                  className={`list-group-item list-group-item-action p-2 ${
-                    activeFile?.id === file.id ? 'active' : ''
-                  }`}
+                  className={`list-group-item list-group-item-action p-2 ${activeFile?.id === file.id ? 'active' : ''}`}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => onFileSelect(file)}
+                  onClick={() => {
+                    console.log('File selected', file);
+                    onFileSelect(file);
+                  }}
                 >
                   <div className="d-flex justify-content-between align-items-start">
                     <div className="flex-grow-1">
@@ -317,8 +345,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
                       </div>
                     )}
                   </div>
-
-                  {/* File Access Control Panel */}
                   {isOwner && showAccessControl === file.id && (
                     <div className="mt-2 p-2 bg-light rounded">
                       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -330,8 +356,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
                           <i className="bi bi-x"></i>
                         </button>
                       </div>
-                      
-                      {/* Access Level Controls */}
                       <div className="mb-2">
                         <small className="text-muted">Access Level:</small>
                         <div className="btn-group w-100" role="group">
@@ -355,8 +379,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
                           </button>
                         </div>
                       </div>
-
-                      {/* User Access Management */}
                       {file.accessLevel === 'restricted' && (
                         <div>
                           <div className="d-flex gap-1 mb-1">
@@ -367,8 +389,6 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
                               <i className="bi bi-person-plus"></i> Grant Access
                             </button>
                           </div>
-                          
-                          {/* Access List */}
                           {fileAccessList[file.id] && (
                             <div className="small">
                               <div className="text-muted">Users with access:</div>
@@ -395,13 +415,9 @@ const ProjectFilesSection = ({ project, activeFile, onFileSelect, onProjectUpdat
             </div>
           )}
         </div>
-
-        {/* Error Message */}
         {error && (
           <div className="alert alert-danger small mb-2">{error}</div>
         )}
-
-        {/* Owner Info */}
         {isOwner && (
           <div className="text-muted small mt-2">
             <i className="bi bi-info-circle"></i> Owner controls available
