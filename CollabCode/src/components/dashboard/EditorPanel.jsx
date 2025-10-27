@@ -9,6 +9,10 @@ const EditorPanel = ({ project, onProjectUpdated, currentUserId }) => {
   const [editing, setEditing] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
 
+console.log(currentUserId);
+console.log("from editor");
+
+
   useEffect(() => {
     if (!project || (project.files && project.files.length === 0)) {
       setActiveFile(null);

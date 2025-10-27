@@ -16,6 +16,8 @@ const Dashboard = () => {
 
   const { user } = useAuth();
   const userId = user?.id ?? null;
+  console.log("from dash"+userId);
+  
 
   useEffect(() => {
     fetchUserProjects();
