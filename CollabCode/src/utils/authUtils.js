@@ -4,7 +4,7 @@ import authService from '../services/api/authService';
 export const login = async ({ userNameOrEmail, password }) => {
   const res = await authService.login({ userNameOrEmail, password });
   localStorage.setItem("token", res.token);
-  localStorage.setItem('user', JSON.stringify({ id: res.userId, displayName: res.userName }));
+  localStorage.setItem('user', JSON.stringify({ id: res.id, displayName: res.userName }));
   return res;
 };
 

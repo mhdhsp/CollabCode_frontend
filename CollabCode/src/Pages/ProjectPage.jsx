@@ -111,18 +111,18 @@ const ProjectPage = () => {
     <div className="container-fluid py-4">
       <div className="row mb-3">
         <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-center align-items-center">
             <div>
               <h2 className="mb-1">{project.projectName || 'Untitled Project'}</h2>
               <small className="text-muted">
                 {isOwner ? 'Owner' : 'Member'} • {project.members?.length || 0} members
               </small>
             </div>
-            <div>
-              <button className="btn btn-outline-secondary me-2" onClick={handleBackToProjects}>
+            {/* <div> */}
+              {/* <button className="btn btn-outline-secondary me-2" onClick={handleBackToProjects}>
                 <i className="bi bi-arrow-left"></i> Back to Projects
-              </button>
-              {isOwner && (
+              </button> */}
+              {/* {isOwner && (
                 <button 
                   className="btn btn-outline-danger"
                   onClick={() => {
@@ -142,8 +142,8 @@ const ProjectPage = () => {
                 >
                   <i className="bi bi-trash"></i> Delete Project
                 </button>
-              )}
-            </div>
+              )} */}
+            {/* </div> */}
           </div>
         </div>
       </div>

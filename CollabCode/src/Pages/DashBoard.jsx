@@ -7,14 +7,15 @@ import projectService from '../services/api/projectService';
 import userService from '../services/api/userService';
 import { getCurrentUser } from '../utils/authUtils';  // Changed import
 
-// Dashboard layout: left (projects), mid-left (files), mid-right editor, right members
 const Dashboard = () => {
   const [userProjects, setUserProjects] = useState(null);
-  const [activeProject, setActiveProject] = useState(null); // ProjectResDto from Enter endpoint
+  const [activeProject, setActiveProject] = useState(null); 
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [error, setError] = useState(null);
 
   const user = getCurrentUser();  // Use util
+  console.log("from dash "+user);
+  
   const userId = user?.id ?? null;
   console.log("from dash"+userId);
   console.log("Dashboard component rendered");

@@ -36,6 +36,7 @@ const ProjectListingPage = () => {
     }
   };
 
+
   const handleProjectSelect = (projectId) => {
     console.log("Project selected:", projectId);
     navigate(`/project/${projectId}`);
@@ -221,7 +222,7 @@ const ProjectListingPage = () => {
         onClose={() => { 
           console.log("Closing join modal and refreshing projects");
           setShowJoin(false); 
-          fetchUserProjects(); 
+          fetchUserProjects();
         }} 
       />
     </div>

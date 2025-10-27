@@ -11,13 +11,19 @@ const projectService = {
     console.log("joinProject called with:", payload);
     const res = await axiosInstance.post('/api/Project/Join', payload);
     console.log("joinProject response:", res.data);
-    return res.data.data ?? res.data.Data ?? res.data;
+    return res.data.data ?? res.data.data ?? res.data;
   },
   enterProject: async (projectId) => {
     console.log("enterProject called with projectId:", projectId);
     const res = await axiosInstance.get(`/api/Project/Enter/${projectId}`);
     console.log("enterProject response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
+  },
+  leaveProject:async (projectId)=>{
+    console.log("leav project with id "+projectId);
+    const res=await axiosInstance.get(`api/Project/Leave/${projectId}`);
+    console.log("leave response", res.data);
+    return res.data.data??  res.data;
   },
   destroyProject: async (projectId) => {
     console.log("destroyProject called with projectId:", projectId);
