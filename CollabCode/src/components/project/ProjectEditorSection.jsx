@@ -1,13 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import fileService from '../../services/api/fileService';
-
+import * as signalR from "@microsoft/signalr"
+import axiosInstance from '../../services/api/axiosInstance';
+import { API_BASE } from '../../config/constants';
 const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUserId }) => {
   const [content, setContent] = useState('');
   const [editing, setEditing] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
+  const [connection,setConnection]=useState();
 
   console.log('ProjectEditorSection rendered', { project, activeFile, currentUserId });
+
+  useEffect(() => {
+  const newConnection = new signalR.HubConnectionBuilder()
+    .withUrl(`${API_BASE}/hubs/project`, {
+      withCredentials: true,
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+  newConnection.start()
+    .then(() => {
+      console.log("✅ SignalR connected");
+      // Join project group
+      newConnection.invoke("JoinGroup", project.id.toString());
+      setConnection(newConnection);
+    })
+    .catch(err => console.error("SignalR connection error:", err));
+
+  // Listen for updates from server
+  newConnection.on("Recieve", (data) => {
+    console.log("📡 Received update from hub:", data);
+    onProjectUpdate(); // refresh project/files
+  });
+
+  return () => {
+    if(connection)
+    connection.stop();
+  };
+}, [project.id]);
 
   React.useEffect(() => {
     console.log('Active file changed', activeFile);
@@ -43,29 +76,45 @@ const ProjectEditorSection = ({ project, activeFile, onProjectUpdate, currentUse
     return true;
   };
 
-  const handleSave = async () => {
-    console.log('Saving file', activeFile);
-    if (!activeFile) return;
-    setStatusMsg(null);
-    setEditing(true);
-    try {
-      await fileService.updateFile({
-        id: activeFile.id,
-        fileName: activeFile.fileName,
-        content,
-        projectId: project.id,
-      });
-      console.log('File saved successfully');
-      setStatusMsg('Saved successfully');
-      onProjectUpdate();
-    } catch (err) {
-      console.error('Save failed', err);
-      setStatusMsg(err?.message || 'Save failed');
-    } finally {
-      setEditing(false);
-      setTimeout(() => setStatusMsg(null), 3000);
+ const handleSave = async () => {
+  console.log('Saving file', activeFile);
+  if (!activeFile) return;
+  setStatusMsg(null);
+  setEditing(true);
+
+  try {
+    await fileService.updateFile({
+      id: activeFile.id,
+      fileName: activeFile.fileName,
+      content,
+      projectId: project.id,
+    });
+
+    console.log('File saved successfully');
+    setStatusMsg('Saved successfully');
+
+    if (connection) {
+      await connection.invoke(
+        "UpdateProject",
+        project.id.toString(),
+        JSON.stringify({
+          fileId: activeFile.id,
+          fileName: activeFile.fileName,
+          updatedBy: currentUserId,
+        })
+      );
+      console.log("📡 File updated and SignalR broadcast sent");
     }
-  };
+
+    onProjectUpdate();
+  } catch (err) {
+    console.error('Save failed', err);
+    setStatusMsg(err?.message || 'Save failed');
+  } finally {
+    setEditing(false);
+    setTimeout(() => setStatusMsg(null), 3000);
+  }
+};
 
   const handleRename = async () => {
     console.log('Renaming file', activeFile);
