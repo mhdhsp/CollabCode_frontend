@@ -21,13 +21,13 @@ const fileService = {
   },
   assign: async (payload) => {
     console.log("assign called with:", payload);
-    const res = await axiosInstance.post('/api/File/Assign', payload);
+    const res = await axiosInstance.patch('/api/File/Assign', payload);
     console.log("assign response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
   unassign: async (fileId) => {
     console.log("unassign called with fileId:", fileId);
-    const res = await axiosInstance.post(`/api/File/UnAssign/${fileId}`);
+    const res = await axiosInstance.patch(`/api/File/UnAssign/${fileId}`);
     console.log("unassign response:", res.data);
     return res.data.data ?? res.data.Data ?? res.data;
   },
